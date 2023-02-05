@@ -3,7 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dhrutara.WriteWise.Api", "Dhrutara.WriteWise.Api\Dhrutara.WriteWise.Api.csproj", "{EF478D62-2830-46F6-9744-384E5FA61B66}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dhrutara.WriteWise.Api", "Dhrutara.WriteWise.Api\Dhrutara.WriteWise.Api.csproj", "{EF478D62-2830-46F6-9744-384E5FA61B66}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{9EC26F84-DF4F-43B3-8F3D-2DA493B07C0D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{DB5EFB27-F657-46AC-A863-DD1E76E5CE2A}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\main_writewiseapi.yml = .github\workflows\main_writewiseapi.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,6 +25,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DB5EFB27-F657-46AC-A863-DD1E76E5CE2A} = {9EC26F84-DF4F-43B3-8F3D-2DA493B07C0D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FA5A8A81-C80D-4B9E-90B5-D91D532FC2B8}
