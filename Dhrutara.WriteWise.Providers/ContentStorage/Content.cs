@@ -11,6 +11,7 @@
 
         public ContentCategory Category { get; set; }
         public ContentType Type { get; set; }
+        public Relation Relation { get; set; } = Relation.None;
         public string Text { get; set; }
     }
 }
