@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 		.github\workflows\main_writewiseapi.yml = .github\workflows\main_writewiseapi.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dhrutara.WriteWise.Providers", "Dhrutara.WriteWise.Providers\Dhrutara.WriteWise.Providers.csproj", "{766AD141-7732-454F-87C8-C345A078DE51}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,6 +24,10 @@ Global
 		{EF478D62-2830-46F6-9744-384E5FA61B66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF478D62-2830-46F6-9744-384E5FA61B66}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF478D62-2830-46F6-9744-384E5FA61B66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{766AD141-7732-454F-87C8-C345A078DE51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{766AD141-7732-454F-87C8-C345A078DE51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{766AD141-7732-454F-87C8-C345A078DE51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{766AD141-7732-454F-87C8-C345A078DE51}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
