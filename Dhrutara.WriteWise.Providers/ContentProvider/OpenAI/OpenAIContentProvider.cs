@@ -1,5 +1,8 @@
-﻿using System.Text;
+﻿using Microsoft.Win32;
+using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
+using System.Transactions;
 
 namespace Dhrutara.WriteWise.Providers.ContentProvider.OpenAI
 {
@@ -15,9 +18,7 @@ namespace Dhrutara.WriteWise.Providers.ContentProvider.OpenAI
 
         public async Task<ContentResponse> GetContentAsync(ContentRequest request, CancellationToken cancellationToken)
         {
-            string prompt = $"A {request.Category} {request.Type}"
-                + (request.To.HasValue ? $" to a {request.To}" : string.Empty)
-                + (request.From.HasValue ? $" from a {request.From}" : string.Empty);
+            string prompt = GeneratePrompt(request);
 
             string? content = await GetContentAsync(prompt, request.MaxContentLength, cancellationToken).ConfigureAwait(false);
 
@@ -31,7 +32,7 @@ namespace Dhrutara.WriteWise.Providers.ContentProvider.OpenAI
             OpenAIRequest apiRequest = new()
             {
                 Frequency_Penalty = 0,
-                Max_Tokens = maxContentLength / 4,
+                Max_Tokens = maxContentLength / 3,
                 Model = "text-davinci-003",
                 Presense_Penalty = 0.6f,
                 Prompt = prompt,
@@ -107,6 +108,11 @@ namespace Dhrutara.WriteWise.Providers.ContentProvider.OpenAI
                         result = string.Empty;
                     }
                 }
+
+                result = result.Replace("\n",string.Empty);
+
+                result = Regex.Replace(result, @"(\d+)\.\ ", string.Empty);
+                result = Regex.Replace(result, @"(\d+)\.", string.Empty);
             }
             else
             {
@@ -114,6 +120,33 @@ namespace Dhrutara.WriteWise.Providers.ContentProvider.OpenAI
             }
 
             return result;
+        }
+
+        private static string GeneratePrompt(ContentRequest request)
+        {
+            StringBuilder prompt = new();
+            if(request.From.HasValue && request.From != Relation.None)
+            {
+                prompt.Append($"Assume you are a {request.From}. ");
+            }
+
+            if(request.Type == ContentType.Message || request.Type == ContentType.Poem)
+            {
+                prompt.Append($"Now write a 4 line {request.Category} {request.Type}");
+            }
+            else
+            {
+                prompt.Append($"Tell a {request.Category} {request.Type}");
+            }
+            
+
+            if(request.To.HasValue && request.To != Relation.None)
+            {
+                prompt.Append($" to your {request.To}");
+            }
+
+            prompt.Append(".");
+            return prompt.ToString();
         }
 
         private class LowerCaseNamingPolicy : JsonNamingPolicy

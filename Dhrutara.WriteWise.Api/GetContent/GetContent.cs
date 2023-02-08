@@ -37,12 +37,6 @@ namespace Dhrutara.WriteWise.Api.GetContent
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req, CancellationToken cancellationToken)
         {
-            //string requestBody = await new StreamReader(req.Body).ReadToEndAsync().ConfigureAwait(false);
-
-            //_logger.LogDebug(JsonConvert.SerializeObject(requestBody, Formatting.Indented));
-
-            //return new OkObjectResult("You've reached me!");
-
             _logger.LogInformation($"{nameof(GetContent)} triggered.");
             try
             {
