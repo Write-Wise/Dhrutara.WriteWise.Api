@@ -2,18 +2,18 @@
 {
     public class ContentResponse
     {
-        public ContentResponse(string? content, bool isContentValid = true)
+        public ContentResponse(string[] content, bool isContentValid = true)
         {
             Content = content;
             IsContentValid = isContentValid;
         }
 
-        public ContentResponse(bool isContentValid):this(null, isContentValid)
+        public ContentResponse(bool isContentValid):this(Array.Empty<string>(), isContentValid)
         {
 
         }
 
-        public string? Content { get; set; }
+        public string[] Content { get; set; }
         public bool IsContentValid { get; set; }
 
     }

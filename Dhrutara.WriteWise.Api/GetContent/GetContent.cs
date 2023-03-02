@@ -77,7 +77,7 @@ namespace Dhrutara.WriteWise.Api.GetContent
             }
             else
             {
-                response.Content = "Pass the request payload in the HTTP request body.";
+                response.Content = new string[] { "Pass the request payload in the HTTP request body." };
             }
 
             return response;
@@ -93,7 +93,7 @@ namespace Dhrutara.WriteWise.Api.GetContent
         {
             if (response.IsContentValid)
             {
-                Content content = new(request.Category, request.Type, response.Content);
+                Content content = new(request.Category, request.Type, JsonConvert.SerializeObject(response.Content));
                 await _contentStorageProvider.AddContentAsync(content, cancellationToken);
             }
         }

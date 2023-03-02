@@ -2,7 +2,7 @@
 {
     internal class ClientResponse
     {
-        public string Content { get; set; }
+        public string[] Content { get; set; }
         public bool IsContentValid { get; set; } = true;
     }
 }

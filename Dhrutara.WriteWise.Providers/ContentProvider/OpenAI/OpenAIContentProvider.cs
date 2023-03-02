@@ -20,14 +20,14 @@ namespace Dhrutara.WriteWise.Providers.ContentProvider.OpenAI
         {
             string prompt = GeneratePrompt(request);
 
-            string? content = await GetContentAsync(prompt, request.MaxContentLength, cancellationToken).ConfigureAwait(false);
+            string[] content = await GetContentAsync(prompt, request.MaxContentLength, cancellationToken).ConfigureAwait(false);
 
-            return !string.IsNullOrWhiteSpace(content)
+            return content.Any(s => !string.IsNullOrWhiteSpace(s) == true)
                 ? new ContentResponse(content) :
                 new ContentResponse(false);
         }
 
-        private async Task<string> GetContentAsync(string prompt, int maxContentLength, CancellationToken cancellationToken)
+        private async Task<string[]> GetContentAsync(string prompt, int maxContentLength, CancellationToken cancellationToken)
         {
             OpenAIRequest apiRequest = new()
             {
@@ -41,8 +41,7 @@ namespace Dhrutara.WriteWise.Providers.ContentProvider.OpenAI
                 Top_P = 1
             };
             OpenAIResponse? response = await GetContentFromOpenAIAsync(apiRequest, cancellationToken).ConfigureAwait(false);
-            string? cleanContent = CleanUpContent(response?.Choices?.FirstOrDefault()?.Text);
-            return cleanContent;
+            return CleanUpContent(response?.Choices?.FirstOrDefault()?.Text);
         }
 
         private async Task<OpenAIResponse?> GetContentFromOpenAIAsync(OpenAIRequest request, CancellationToken cancellationToken)
@@ -78,48 +77,49 @@ namespace Dhrutara.WriteWise.Providers.ContentProvider.OpenAI
             return null;
         }
 
-        private static string CleanUpContent(string? content)
+        private static string[] CleanUpContent(string? content)
         {
-            string? result = content;
-            if (!string.IsNullOrWhiteSpace(result))
+            string? tempResult = content;
+            if (!string.IsNullOrWhiteSpace(tempResult))
             {
-                if (!result.StartsWith("\n\n"))
+                if (!tempResult.StartsWith("\n\n"))
                 {
-                    int index = result.IndexOf("\n\n");
+                    int index = tempResult.IndexOf("\n\n");
                     if (index > -1)
                     {
-                        result = result[index..];
+                        tempResult = tempResult[index..];
                     }
                     else
                     {
-                        result = string.Empty;
+                        tempResult = string.Empty;
                     }
                 }
 
-                if (!result.EndsWith('.') && !result.EndsWith('!') && !result.EndsWith('?'))
+                if (!tempResult.EndsWith('.') && !tempResult.EndsWith('!') && !tempResult.EndsWith('?'))
                 {
-                    int lastSentenceFinisherindex = result.LastIndexOfAny(new[] { '.', '!', '?' });
+                    int lastSentenceFinisherindex = tempResult.LastIndexOfAny(new[] { '.', '!', '?' });
                     if (lastSentenceFinisherindex > -1)
                     {
-                        result = result[..(lastSentenceFinisherindex + 1)];
+                        tempResult = tempResult[..(lastSentenceFinisherindex + 1)];
                     }
                     else
                     {
-                        result = string.Empty;
+                        tempResult = string.Empty;
                     }
                 }
 
-                result = result.Replace("\n",string.Empty);
+                tempResult = Regex.Replace(tempResult, @"(\d+)\.\ ", string.Empty);
+                tempResult = Regex.Replace(tempResult, @"(\d+)\.", string.Empty);
 
-                result = Regex.Replace(result, @"(\d+)\.\ ", string.Empty);
-                result = Regex.Replace(result, @"(\d+)\.", string.Empty);
+                tempResult = tempResult.Replace("\n\n","\n");
+
+                return tempResult.Split("\n").Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
+
             }
             else
             {
-                result = string.Empty;
+                return Array.Empty<string>();
             }
-
-            return result;
         }
 
         private static string GeneratePrompt(ContentRequest request)
