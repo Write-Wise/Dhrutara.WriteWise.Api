@@ -7,7 +7,7 @@
         Birthday = 2,
         Wedding = 3,
         WeddingAnniversary = 4,
-        DeathCondolence = 5,
+        Condolence = 5,
         Promotion = 6,
         NewJob = 7,
     }
