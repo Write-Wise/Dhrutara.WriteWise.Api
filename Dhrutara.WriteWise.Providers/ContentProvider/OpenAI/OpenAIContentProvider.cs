@@ -130,17 +130,24 @@ namespace Dhrutara.WriteWise.Providers.ContentProvider.OpenAI
                 prompt.Append($"Assume you are a {request.From}. ");
             }
 
-            if(request.Type == ContentType.Message || request.Type == ContentType.Poem)
-            {
-                prompt.Append($"Now write a 4 line {request.Category} {request.Type}");
-            }
-            else
-            {
-                prompt.Append($"Tell a {request.Category} {request.Type}");
-            }
             
 
-            if(request.To.HasValue && request.To != Relation.None)
+            switch (request.Type)
+            {
+                case ContentType.Joke:
+                    prompt.Append($"Tell me a {request.Category} {request.Type}");
+                    break;
+                case ContentType.Poem:
+                case ContentType.Message:
+                default:
+                    prompt.Append($"Now write a 4 line {request.Category} {ContentType.Poem}");
+                    break;
+            }
+
+            Writer writer = Constants.GetARandomWriter(request.Type);
+            prompt.Append($" in the style of {writer.FirstName} {writer.LastName}");
+
+            if (request.To.HasValue && request.To != Relation.None)
             {
                 prompt.Append($" to your {request.To}");
             }
