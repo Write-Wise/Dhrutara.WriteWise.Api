@@ -2,6 +2,7 @@
 {
     public interface IUserAccountService
     {
-        Task<Guid> DeleteUserAsync(string userId, CancellationToken cancellationToken);
+        UserAccount? GetUserAccount(string? authToken);
+        Task DeleteUserAsync(UserAccount? userAccount, CancellationToken cancellationToken);
     }
 }

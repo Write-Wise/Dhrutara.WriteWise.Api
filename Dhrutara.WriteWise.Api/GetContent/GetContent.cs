@@ -1,11 +1,7 @@
-using System;
-using System.IO;
 using System.Net;
 using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 using Dhrutara.WriteWise.Providers.ContentProvider;
-using Dhrutara.WriteWise.Providers.ContentStorage;
+using Dhrutara.WriteWise.Providers.Storage;
 using Dhrutara.WriteWise.Providers.ExtensionMethods;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -21,10 +17,10 @@ namespace Dhrutara.WriteWise.Api.GetContent
     public class GetContent
     {
         private readonly IContentProvider _contentProvider;
-        private readonly IContentStorageProvider _contentStorageProvider;
+        private readonly IStorageProvider _contentStorageProvider;
         private readonly ILogger<GetContent> _logger;
 
-        public GetContent(IContentProvider contentProvider, IContentStorageProvider contentStorageProvider, ILogger<GetContent> logger)
+        public GetContent(IContentProvider contentProvider, IStorageProvider contentStorageProvider, ILogger<GetContent> logger)
         {
             _contentProvider = contentProvider;
             _contentStorageProvider = contentStorageProvider;
@@ -42,22 +38,23 @@ namespace Dhrutara.WriteWise.Api.GetContent
 
             try
             {
-                ClientRequest request;
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync().ConfigureAwait(false);
+                
                 try
                 {
-                    request = JsonConvert.DeserializeObject<ClientRequest>(requestBody);
+                    ClientRequest? request = JsonConvert.DeserializeObject<ClientRequest>(requestBody);
+                    ClientResponse response = await GenerateResponseAsync(request, cancellationToken).ConfigureAwait(false);
+
+                    StoreContentAsync(request, response, cancellationToken).SafeFireAndForget(false);
+
+                    return new OkObjectResult(response);
                 }
                 catch (JsonSerializationException)
                 {
                     return new BadRequestObjectResult("The request payload is not valid!");
                 }
 
-                ClientResponse response = await GenerateResponseAsync(request, cancellationToken).ConfigureAwait(false);
-
-                StoreContentAsync(request, response, cancellationToken).SafeFireAndForget(false);
-
-                return new OkObjectResult(response);
+               
             }
             catch (Exception ex)
             {
@@ -66,7 +63,7 @@ namespace Dhrutara.WriteWise.Api.GetContent
             }
         }
 
-        private async Task<ClientResponse> GenerateResponseAsync(ClientRequest request, CancellationToken cancellationToken)
+        private async Task<ClientResponse> GenerateResponseAsync(ClientRequest? request, CancellationToken cancellationToken)
         {
             ClientResponse response = new();
 
@@ -75,7 +72,6 @@ namespace Dhrutara.WriteWise.Api.GetContent
                 ContentResponse msgResponse = await GetContentAsync(request, cancellationToken).ConfigureAwait(false);
                 response.Content = msgResponse.Content;
                 response.IsContentValid = msgResponse.IsContentValid;
-                //response.Content = await GetTestContentAsync().ConfigureAwait(false);
             }
             else
             {
@@ -91,12 +87,12 @@ namespace Dhrutara.WriteWise.Api.GetContent
             return await _contentProvider.GetContentAsync(contentRequest, cancellationToken).ConfigureAwait(false);
         }
 
-        private async Task StoreContentAsync(ClientRequest request, ClientResponse response, CancellationToken cancellationToken)
+        private async Task StoreContentAsync(ClientRequest? request, ClientResponse response, CancellationToken cancellationToken)
         {
-            if (response.IsContentValid)
+            if (request != null && response.IsContentValid)
             {
                 Content content = new(request.Category, request.Type, JsonConvert.SerializeObject(response.Content));
-                await _contentStorageProvider.AddContentAsync(content, cancellationToken);
+                _ = await _contentStorageProvider.AddContentAsync(content, cancellationToken);
             }
         }
 

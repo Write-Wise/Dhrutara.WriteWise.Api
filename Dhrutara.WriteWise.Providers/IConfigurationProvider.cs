@@ -4,8 +4,9 @@
     {
         Uri CosmosEndpointUri { get;}
         string CosmosAuthKey { get; }
-        string CosmosContentDatabase { get; }
-        string CosmosContentContainer { get; }
+        string CosmosDatabaseContent { get; }
+        string CosmosContainerContent { get; }
+        string CosmosContainerDeletedUser { get; }
         Uri OpenAIUri { get; }
         string OpenAIAuthKey { get; }
 

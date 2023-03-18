@@ -125,7 +125,7 @@ namespace Dhrutara.WriteWise.Providers.ContentProvider.OpenAI
             StringBuilder prompt = new();
             if(request.From.HasValue && request.From != Relation.None)
             {
-                prompt.Append($"Assume you are a {request.From}. ");
+                _ = prompt.Append($"Assume you are a {request.From}. ");
             }
 
             
@@ -133,24 +133,24 @@ namespace Dhrutara.WriteWise.Providers.ContentProvider.OpenAI
             switch (request.Type)
             {
                 case ContentType.Joke:
-                    prompt.Append($"Tell me a {request.Category} {request.Type}");
+                    _ = prompt.Append($"Tell me a {request.Category} {request.Type}");
                     break;
                 case ContentType.Poem:
                 case ContentType.Message:
                 default:
-                    prompt.Append($"Now write a 4 line {request.Category} {ContentType.Poem}");
+                    _ = prompt.Append($"Now write a 4 line {request.Category} {ContentType.Poem}");
                     break;
             }
 
             Writer writer = Constants.GetARandomWriter(request.Type);
-            prompt.Append($" in the style of {writer.FirstName} {writer.LastName}");
+            _ = prompt.Append($" in the style of {writer.FirstName} {writer.LastName}");
 
             if (request.To.HasValue && request.To != Relation.None)
             {
-                prompt.Append($" to your {request.To}");
+                _ = prompt.Append($" to your {request.To}");
             }
 
-            prompt.Append('.');
+            _ = prompt.Append('.');
             return prompt.ToString();
         }
 
