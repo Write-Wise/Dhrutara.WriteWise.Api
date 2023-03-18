@@ -1,4 +1,4 @@
-﻿namespace Dhrutara.WriteWise.Providers.ContentStorage
+﻿namespace Dhrutara.WriteWise.Providers.Storage
 {
     internal class StorageContent
     {

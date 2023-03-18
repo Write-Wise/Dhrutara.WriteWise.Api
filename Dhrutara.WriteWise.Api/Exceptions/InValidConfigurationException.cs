@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Dhrutara.WriteWise.Api.Exceptions
+﻿namespace Dhrutara.WriteWise.Api.Exceptions
 {
     public class InValidConfigurationException : ApplicationException
     {
