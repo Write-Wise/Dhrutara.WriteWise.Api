@@ -12,6 +12,10 @@ namespace Dhrutara.WriteWise.Api
         const string COSMOS_CONTENT_CONTAINER_CONFIG_KEY = "ContentContainer";
         const string OPENAI_ENDPOINT_URI_CONFIG_KEY = "OpenAIUri";
         const string OPENAI_AUTH_CONFIG_KEY = "OpenAIAPIKey";
+        const string AUTH_TENANT_ID_CONFIG_KEY = "AuthTenantId";
+        const string AUTH_CLIENT_ID_CONFIG_KEY = "AuthClientId";
+        const string AUTH_CLIENT_SECRET_CONFIG_KEY = "AuthClientSecret";
+        const string MICROSOFT_GRAPH_BASE_URI_CONFIG_KEY = "MicrosoftGraphBaseUri";
 
         private readonly Uri _cosmosEndpointUri;
         private readonly string _cosmosAuthKey;
@@ -19,6 +23,11 @@ namespace Dhrutara.WriteWise.Api
         private readonly string _cosmosContentContainer;
         private readonly Uri _openAIUri;
         private readonly string _openAIAuthKey;
+        private readonly string _authTenantId;
+        private readonly string _authClientId;
+        private readonly string _authClientSecret;
+        private readonly Uri _microsoftGraphBaseUri;
+
 
         public ConfigurationProvider()
         {
@@ -53,6 +62,28 @@ namespace Dhrutara.WriteWise.Api
             {
                 throw new InValidConfigurationException(OPENAI_AUTH_CONFIG_KEY);
             }
+
+            _authTenantId = Environment.GetEnvironmentVariable(AUTH_TENANT_ID_CONFIG_KEY, EnvironmentVariableTarget.Process);
+            if (string.IsNullOrWhiteSpace(_authTenantId))
+            {
+                throw new InValidConfigurationException(AUTH_TENANT_ID_CONFIG_KEY);
+            }
+
+            _authClientId = Environment.GetEnvironmentVariable(AUTH_CLIENT_ID_CONFIG_KEY, EnvironmentVariableTarget.Process);
+            if (string.IsNullOrWhiteSpace(_authClientId))
+            {
+                throw new InValidConfigurationException(AUTH_CLIENT_ID_CONFIG_KEY);
+            }
+
+            _authClientSecret = Environment.GetEnvironmentVariable(AUTH_CLIENT_SECRET_CONFIG_KEY, EnvironmentVariableTarget.Process);
+            if (string.IsNullOrWhiteSpace(_authClientSecret))
+            {
+                throw new InValidConfigurationException(AUTH_CLIENT_SECRET_CONFIG_KEY);
+            }
+
+            _microsoftGraphBaseUri = Uri.TryCreate(Environment.GetEnvironmentVariable(MICROSOFT_GRAPH_BASE_URI_CONFIG_KEY, EnvironmentVariableTarget.Process), UriKind.Absolute, out Uri urimicrosoftGraph)
+               ? urimicrosoftGraph
+               : throw new InValidConfigurationException(MICROSOFT_GRAPH_BASE_URI_CONFIG_KEY);
         }
 
         public Uri CosmosEndpointUri => _cosmosEndpointUri;
@@ -66,5 +97,13 @@ namespace Dhrutara.WriteWise.Api
         public Uri OpenAIUri => _openAIUri;
 
         public string OpenAIAuthKey => _openAIAuthKey;
+
+        public string AuthTenantId => _authTenantId;
+
+        public string AuthClientId => _authClientId;
+
+        public string AuthClientSecret => _authClientSecret;
+
+        public Uri MicrosoftGraphBaseUri => _microsoftGraphBaseUri;
     }
 }

@@ -1,8 +1,6 @@
-﻿using Microsoft.Win32;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Transactions;
 
 namespace Dhrutara.WriteWise.Providers.ContentProvider.OpenAI
 {
@@ -152,7 +150,7 @@ namespace Dhrutara.WriteWise.Providers.ContentProvider.OpenAI
                 prompt.Append($" to your {request.To}");
             }
 
-            prompt.Append(".");
+            prompt.Append('.');
             return prompt.ToString();
         }
 

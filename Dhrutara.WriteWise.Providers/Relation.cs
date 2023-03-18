@@ -1,7 +1,4 @@
-﻿
-using System.ComponentModel.DataAnnotations;
-
-namespace Dhrutara.WriteWise.Providers
+﻿namespace Dhrutara.WriteWise.Providers
 {
     public enum Relation
     {

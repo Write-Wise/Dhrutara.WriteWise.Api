@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Net;
+using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Dhrutara.WriteWise.Providers.ContentProvider;
@@ -30,14 +31,15 @@ namespace Dhrutara.WriteWise.Api.GetContent
             _logger = logger;
         }
 
-        [FunctionName("getcontent")]
+        [FunctionName("GetContent")]
         [OpenApiOperation(operationId: "Run", tags: new[] { "name" })]
         [OpenApiParameter(name: "name", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "The **Name** parameter")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Description = "The OK response")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req, CancellationToken cancellationToken)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req, ClaimsPrincipal claimsPrincipal,  CancellationToken cancellationToken)
         {
             _logger.LogInformation($"{nameof(GetContent)} triggered.");
+
             try
             {
                 ClientRequest request;
@@ -105,6 +107,8 @@ namespace Dhrutara.WriteWise.Api.GetContent
             string content = "\n\nWith each passing day, I am more and more in awe of the strength of our love. In the moments when life is hard and I".Replace("\n", "").Replace("\r", "");
             return content;
         }
+
+        
     }
 }
 

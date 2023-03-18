@@ -7,10 +7,10 @@ using Dhrutara.WriteWise.Providers.ContentProvider;
 using Dhrutara.WriteWise.Providers.ContentProvider.OpenAI;
 using Dhrutara.WriteWise.Providers.ContentStorage;
 using Dhrutara.WriteWise.Providers.ContentStorage.Cosmos;
+using Dhrutara.WriteWise.Providers.UserServiceProvider;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Fluent;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 using Polly.Extensions.Http;
@@ -20,10 +20,10 @@ namespace Dhrutara.WriteWise.Api
 {
     public class Startup : FunctionsStartup
     {
-        private static readonly IConfigurationRoot Configuration = new ConfigurationBuilder()
-            .SetBasePath(Environment.CurrentDirectory)
-            .AddEnvironmentVariables()
-            .Build();
+        //private static readonly IConfigurationRoot Configuration = new ConfigurationBuilder()
+        //    .SetBasePath(Environment.CurrentDirectory)
+        //    .AddEnvironmentVariables()
+        //    .Build();
 
         public override void Configure(IFunctionsHostBuilder builder)
         {
@@ -39,11 +39,20 @@ namespace Dhrutara.WriteWise.Api
                 .AddSingleton(s => cosmosClient)
                 .AddSingleton(s => cosmosClient.GetDatabase(configProvider.CosmosContentDatabase))
                 .AddSingleton<IHashProvider, HashProvider>()
-                .AddSingleton<IContentStorageProvider, CosmosContentStorageProvider>()
+                .AddSingleton<IContentStorageProvider, CosmosContentStorageProvider>();
+
+            builder.Services
                 .AddHttpClient<IContentProvider, OpenAIContentProvider>(client =>
                 {
                     client.BaseAddress = configProvider.OpenAIUri;
                     client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", configProvider.OpenAIAuthKey);
+                })
+                .AddPolicyHandler(GetRetryPolicy())
+                .AddPolicyHandler(GetCircuitBreakerPolicy());
+
+            builder.Services
+                .AddHttpClient<IUserAccountService, UserAccountService>(client => {
+                    client.BaseAddress = configProvider.MicrosoftGraphBaseUri;
                 })
                 .AddPolicyHandler(GetRetryPolicy())
                 .AddPolicyHandler(GetCircuitBreakerPolicy());
