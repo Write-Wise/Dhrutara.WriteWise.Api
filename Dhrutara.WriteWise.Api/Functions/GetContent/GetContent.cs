@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 
-namespace Dhrutara.WriteWise.Api.GetContent
+namespace Dhrutara.WriteWise.Api.Functions.GetContent
 {
     public class GetContent
     {
@@ -32,14 +32,14 @@ namespace Dhrutara.WriteWise.Api.GetContent
         [OpenApiParameter(name: "name", In = ParameterLocation.Query, Required = true, Type = typeof(string), Description = "The **Name** parameter")]
         [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Description = "The OK response")]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req, ClaimsPrincipal claimsPrincipal,  CancellationToken cancellationToken)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = null)] HttpRequest req, ClaimsPrincipal claimsPrincipal, CancellationToken cancellationToken)
         {
             _logger.LogInformation($"{nameof(GetContent)} triggered.");
 
             try
             {
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync().ConfigureAwait(false);
-                
+
                 try
                 {
                     ClientRequest? request = JsonConvert.DeserializeObject<ClientRequest>(requestBody);
@@ -54,7 +54,7 @@ namespace Dhrutara.WriteWise.Api.GetContent
                     return new BadRequestObjectResult("The request payload is not valid!");
                 }
 
-               
+
             }
             catch (Exception ex)
             {
@@ -104,7 +104,7 @@ namespace Dhrutara.WriteWise.Api.GetContent
             return content;
         }
 
-        
+
     }
 }
 

@@ -1,4 +1,4 @@
-﻿namespace Dhrutara.WriteWise.Api.GetContent
+﻿namespace Dhrutara.WriteWise.Api.Functions.GetContent
 {
     internal class ClientResponse
     {

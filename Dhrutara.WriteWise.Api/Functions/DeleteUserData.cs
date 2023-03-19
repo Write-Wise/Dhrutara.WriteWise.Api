@@ -1,13 +1,12 @@
+using Dhrutara.WriteWise.Providers.Storage;
+using Dhrutara.WriteWise.Providers.UserServiceProvider;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Dhrutara.WriteWise.Providers.UserServiceProvider;
-using Dhrutara.WriteWise.Providers.Storage;
-using Dhrutara.WriteWise.Providers;
 
-namespace Dhrutara.WriteWise.Api
+namespace Dhrutara.WriteWise.Api.Functions
 {
     public class DeleteUserData
     {

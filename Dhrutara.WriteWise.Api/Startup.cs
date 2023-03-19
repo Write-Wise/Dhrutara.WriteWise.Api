@@ -25,49 +25,57 @@ namespace Dhrutara.WriteWise.Api
         {
             _ = builder.Services.AddSingleton<Providers.IConfigurationProvider, ConfigurationProvider>();
 
-            Providers.IConfigurationProvider configProvider = builder.Services.BuildServiceProvider().GetService<Providers.IConfigurationProvider>();
+            Providers.IConfigurationProvider? configProvider = builder?
+                .Services?
+                .BuildServiceProvider()?
+                .GetService<Providers.IConfigurationProvider>();
 
-            CosmosClient cosmosClient = new CosmosClientBuilder(configProvider.CosmosEndpointUri.AbsoluteUri, configProvider.CosmosAuthKey)
+            if(configProvider != null && builder != null)
+            {
+                CosmosClient cosmosClient = new CosmosClientBuilder(configProvider.CosmosEndpointUri.AbsoluteUri, configProvider.CosmosAuthKey)
                 .Build();
 
-            TokenCredentialOptions options = new()
-            {
-                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
-            };
+                _ = builder.Services
+                    .AddSingleton(s => cosmosClient)
+                    .AddSingleton(s => cosmosClient.GetDatabase(configProvider.CosmosDatabaseContent))
+                    .AddSingleton<IStorageProvider, CosmosStorageProvider>();
 
-            ClientSecretCredential clientSecretCredential = new(configProvider.AuthTenantId, configProvider.AuthClientId, configProvider.AuthClientSecret, options);
-
-            GraphServiceClient graphClient = new(clientSecretCredential, new[] { "https://graph.microsoft.com/.default" });
-
-            _ = builder.Services
-                .AddSingleton(s => graphClient);
-
-
-            _ = builder.Services
-                .AddSingleton(s => cosmosClient)
-                .AddSingleton(s => cosmosClient.GetDatabase(configProvider.CosmosDatabaseContent))
-                .AddSingleton<IHashProvider, HashProvider>()
-                .AddSingleton<IStorageProvider, CosmosStorageProvider>()
-                .AddSingleton<IUserAccountService, UserAccountService>();
-
-
-            _ = builder.Services
-                .AddHttpClient<IContentProvider, OpenAIContentProvider>(client =>
+                TokenCredentialOptions options = new()
                 {
-                    client.BaseAddress = configProvider.OpenAIUri;
-                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", configProvider.OpenAIAuthKey);
-                })
-                .AddPolicyHandler(GetRetryPolicy())
-                .AddPolicyHandler(GetCircuitBreakerPolicy());
+                    AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+                };
+
+                ClientSecretCredential clientSecretCredential = new(configProvider.AuthTenantId, configProvider.AuthClientId, configProvider.AuthClientSecret, options);
+
+                GraphServiceClient graphClient = new(clientSecretCredential, new[] { "https://graph.microsoft.com/.default" });
+
+                _ = builder.Services
+                    .AddSingleton(s => graphClient);
 
 
-            _ = builder.Services
-                .AddHttpClient<IUserAccountService, UserAccountService>(client =>
-                {
-                    client.BaseAddress = configProvider.MicrosoftGraphBaseUri;
-                })
-                .AddPolicyHandler(GetRetryPolicy())
-                .AddPolicyHandler(GetCircuitBreakerPolicy());
+                _ = builder.Services
+                    .AddSingleton<IHashProvider, HashProvider>()
+                    .AddSingleton<IUserAccountService, UserAccountService>();
+
+
+                _ = builder.Services
+                    .AddHttpClient<IContentProvider, OpenAIContentProvider>(client =>
+                    {
+                        client.BaseAddress = configProvider.OpenAIUri;
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", configProvider.OpenAIAuthKey);
+                    })
+                    .AddPolicyHandler(GetRetryPolicy())
+                    .AddPolicyHandler(GetCircuitBreakerPolicy());
+
+
+                _ = builder.Services
+                    .AddHttpClient<IUserAccountService, UserAccountService>(client =>
+                    {
+                        client.BaseAddress = configProvider.MicrosoftGraphBaseUri;
+                    })
+                    .AddPolicyHandler(GetRetryPolicy())
+                    .AddPolicyHandler(GetCircuitBreakerPolicy());
+            }
         }
 
         static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()

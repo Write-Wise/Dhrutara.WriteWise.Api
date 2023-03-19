@@ -1,4 +1,4 @@
-﻿namespace Dhrutara.WriteWise.Api.Exceptions
+﻿namespace Dhrutara.WriteWise.Providers.Exceptions
 {
     public class InValidConfigurationException : ApplicationException
     {

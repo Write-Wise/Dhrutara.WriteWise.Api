@@ -1,7 +1,6 @@
-﻿using Dhrutara.WriteWise.Providers;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
-namespace Dhrutara.WriteWise.Api.GetContent
+namespace Dhrutara.WriteWise.Api.Functions.GetContent
 {
     internal class ClientRequest
     {
