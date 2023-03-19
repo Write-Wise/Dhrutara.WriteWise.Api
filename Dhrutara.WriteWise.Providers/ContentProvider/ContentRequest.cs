@@ -1,5 +1,4 @@
-﻿
-namespace Dhrutara.WriteWise.Providers.ContentProvider
+﻿namespace Dhrutara.WriteWise.Providers.ContentProvider
 {
     public  class ContentRequest
     {

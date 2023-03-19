@@ -1,4 +1,4 @@
-﻿namespace Dhrutara.WriteWise.Providers
+﻿namespace Dhrutara.WriteWise.Providers.Constants
 {
     public enum Relation
     {

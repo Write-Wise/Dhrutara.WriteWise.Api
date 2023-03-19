@@ -1,6 +1,5 @@
 ﻿using Dhrutara.WriteWise.Providers.UserServiceProvider;
 using Microsoft.Azure.Cosmos;
-using Microsoft.Graph.Models;
 using Container = Microsoft.Azure.Cosmos.Container;
 
 
