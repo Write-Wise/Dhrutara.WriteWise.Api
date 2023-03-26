@@ -14,6 +14,5 @@
         public ContentType Type { get; set; }
         public Relation? From { get; set; }
         public Relation? To { get; set; }
-        public int MaxContentLength { get; set; } = 200;
     }
 }

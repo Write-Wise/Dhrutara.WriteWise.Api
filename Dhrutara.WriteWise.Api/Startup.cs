@@ -66,15 +66,6 @@ namespace Dhrutara.WriteWise.Api
                     })
                     .AddPolicyHandler(GetRetryPolicy())
                     .AddPolicyHandler(GetCircuitBreakerPolicy());
-
-
-                _ = builder.Services
-                    .AddHttpClient<IUserAccountService, UserAccountService>(client =>
-                    {
-                        client.BaseAddress = configProvider.MicrosoftGraphBaseUri;
-                    })
-                    .AddPolicyHandler(GetRetryPolicy())
-                    .AddPolicyHandler(GetCircuitBreakerPolicy());
             }
         }
 

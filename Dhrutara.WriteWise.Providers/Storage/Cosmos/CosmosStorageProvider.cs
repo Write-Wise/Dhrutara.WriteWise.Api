@@ -35,7 +35,7 @@ namespace Dhrutara.WriteWise.Providers.Storage.Cosmos
             if (content != null && !string.IsNullOrWhiteSpace(content.Text))
             {
                 string textHash = _hashProvider.ComputeSha256Hash(content.Text);
-                StorageContent input = new(textHash, content.Category, content.Type, content.Text, "Sha256", content.Relation.ToString());
+                StorageContent input = new(textHash, content.Category, content.Type, content.Text, "Sha256", content.Receiver, content.Sender);
                 _ = await _containerContent.Value.Scripts
                     .ExecuteStoredProcedureAsync<StorageContent>("spCreateContent", new PartitionKey(input.categoryPlusType), new dynamic[] { input }, cancellationToken: cancellationToken).ConfigureAwait(false);
             }
