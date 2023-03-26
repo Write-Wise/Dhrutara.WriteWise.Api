@@ -9,11 +9,10 @@
         string CosmosContainerDeletedUser { get; }
         Uri OpenAIUri { get; }
         string OpenAIAuthKey { get; }
-
+        string OpenAIModel { get; }
+        int OpenAIMaxTokens { get; }
         string AuthTenantId { get; }
         string AuthClientId { get; }
         string AuthClientSecret { get; }
-
-        Uri MicrosoftGraphBaseUri { get; }
     }
 }

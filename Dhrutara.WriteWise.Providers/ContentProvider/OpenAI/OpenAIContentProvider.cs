@@ -7,48 +7,39 @@ namespace Dhrutara.WriteWise.Providers.ContentProvider.OpenAI
     public class OpenAIContentProvider : IContentProvider
     {
         private readonly HttpClient _httpClient;
+        private readonly IConfigurationProvider _configurationProvider;
 
 
-        public OpenAIContentProvider(HttpClient httpClient)
+        public OpenAIContentProvider(HttpClient httpClient, IConfigurationProvider configurationProvider)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _configurationProvider = configurationProvider ?? throw new ArgumentNullException(nameof(configurationProvider));
         }
 
         public async Task<ContentResponse> GetContentAsync(ContentRequest request, CancellationToken cancellationToken)
         {
             string prompt = GeneratePrompt(request);
 
-            string[] content = await GetContentAsync(prompt, request.MaxContentLength, cancellationToken).ConfigureAwait(false);
+            string[] content = await GetContentAsync(prompt, cancellationToken).ConfigureAwait(false);
 
             return content.Any(s => !string.IsNullOrWhiteSpace(s) == true)
                 ? new ContentResponse(content) :
                 new ContentResponse(false);
         }
 
-        private async Task<string[]> GetContentAsync(string prompt, int maxContentLength, CancellationToken cancellationToken)
+        private async Task<string[]> GetContentAsync(string prompt, CancellationToken cancellationToken)
         {
-            OpenAIRequest apiRequest = new()
-            {
-                Frequency_Penalty = 0,
-                Max_Tokens = maxContentLength / 3,
-                Model = "text-davinci-003",
-                Presense_Penalty = 0.6f,
-                Prompt = prompt,
-                Stop = new List<string> { "Human:", "AI:" },
-                Temperature = 0.9f,
-                Top_P = 1
-            };
-            OpenAIResponse? response = await GetContentFromOpenAIAsync(apiRequest, cancellationToken).ConfigureAwait(false);
+            OpenAIResponse? response = await GetContentFromOpenAIAsync(prompt, cancellationToken).ConfigureAwait(false);
             return CleanUpContent(response?.Choices?.FirstOrDefault()?.Text);
         }
 
-        private async Task<OpenAIResponse?> GetContentFromOpenAIAsync(OpenAIRequest request, CancellationToken cancellationToken)
+        private async Task<OpenAIResponse?> GetContentFromOpenAIAsync(string prompt, CancellationToken cancellationToken)
         {
             string stringContent = @"{
-  ""model"": ""text-davinci-003"",
-  ""prompt"": """ + request.Prompt + @""",
+  ""model"": """ + _configurationProvider.OpenAIModel + @""",
+  ""prompt"": """ + prompt + @""",
   ""temperature"": 0.9,
-  ""max_tokens"": " + request.Max_Tokens + @",
+  ""max_tokens"": " + _configurationProvider.OpenAIMaxTokens + @",
   ""top_p"": 1,
   ""frequency_penalty"": 0.0,
   ""presence_penalty"": 0.6,
@@ -61,9 +52,7 @@ namespace Dhrutara.WriteWise.Providers.ContentProvider.OpenAI
                 WriteIndented = true,
             };
 
-            //string jsonContent = JsonSerializer.Serialize<Request>(apiRequest, options);
             HttpContent content = new StringContent(stringContent, Encoding.UTF8, "application/json");
-            //HttpResponseMessage apiResponse = await _httpClient.PostAsync("v1/completions", apiRequest, options: options, cancellationToken: cancellationToken).ConfigureAwait(false);
             HttpResponseMessage apiResponse = await _httpClient.PostAsync("v1/completions", content, cancellationToken).ConfigureAwait(false);
 
             if (apiResponse.IsSuccessStatusCode)
@@ -128,20 +117,11 @@ namespace Dhrutara.WriteWise.Providers.ContentProvider.OpenAI
                 _ = prompt.Append($"Assume you are a {request.From}. ");
             }
 
-            
-
-            switch (request.Type)
+            _ = request.Type switch
             {
-                case ContentType.Joke:
-                    _ = prompt.Append($"Tell me a {request.Category} {request.Type}");
-                    break;
-                case ContentType.Poem:
-                case ContentType.Message:
-                default:
-                    _ = prompt.Append($"Now write a 4 line {request.Category} {ContentType.Poem}");
-                    break;
-            }
-
+                ContentType.Joke => prompt.Append($"Tell me a {request.Category} {request.Type}"),
+                _ => prompt.Append($"Now write a small {request.Category} {ContentType.Poem}"),
+            };
             Writer writer = Constants.GetARandomWriter(request.Type);
             _ = prompt.Append($" in the style of {writer.FirstName} {writer.LastName}");
 

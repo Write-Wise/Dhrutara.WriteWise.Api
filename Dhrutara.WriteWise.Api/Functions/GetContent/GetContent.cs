@@ -91,7 +91,11 @@ namespace Dhrutara.WriteWise.Api.Functions.GetContent
         {
             if (request != null && response.IsContentValid)
             {
-                Content content = new(request.Category, request.Type, JsonConvert.SerializeObject(response.Content));
+                Content content = new(request.Category, request.Type, JsonConvert.SerializeObject(response.Content))
+                {
+                    Receiver = request.To ?? Relation.None,
+                    Sender = request.From ?? Relation.None,
+                };
                 _ = await _contentStorageProvider.AddContentAsync(content, cancellationToken);
             }
         }
